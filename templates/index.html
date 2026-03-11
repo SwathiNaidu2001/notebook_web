@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notepad</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Notepad</h2>
+      <div class="search-wrap">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <input id="search" type="text" placeholder="Search sheets…">
+      </div>
+    </div>
+
+    <button class="new-sheet-btn" onclick="newSheet()">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+        <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      New Sheet
+    </button>
+
+    <div id="sheetList"></div>
+  </aside>
+
+  <!-- ── Editor ── -->
+  <div class="editor-container">
+    <div class="toolbar">
+
+      <!-- Formatting -->
+      <div class="toolbar-group">
+        <select class="tb-select" onchange="fmt('formatBlock', this.value); this.value='p'">
+          <option value="p">Paragraph</option>
+          <option value="h1">Heading 1</option>
+          <option value="h2">Heading 2</option>
+          <option value="h3">Heading 3</option>
+        </select>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="tb-btn" onclick="fmt('bold')" title="Bold (Ctrl+B)">
+          <svg width="13" height="13" viewBox="0 0 13 13"><text x="1" y="11" font-family="serif" font-weight="900" font-size="13" fill="currentColor">B</text></svg>
+        </button>
+        <button class="tb-btn" onclick="fmt('italic')" title="Italic (Ctrl+I)" style="font-style:italic;font-family:serif">
+          <svg width="13" height="13" viewBox="0 0 13 13"><text x="2" y="11" font-family="serif" font-style="italic" font-size="13" fill="currentColor">I</text></svg>
+        </button>
+        <button class="tb-btn" onclick="fmt('underline')" title="Underline (Ctrl+U)" style="text-decoration:underline">
+          <svg width="13" height="13" viewBox="0 0 13 13"><text x="1" y="11" font-size="13" fill="currentColor" text-decoration="underline" font-family="serif">U</text></svg>
+        </button>
+        <button class="tb-btn" onclick="fmt('strikeThrough')" title="Strikethrough">
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M4 4c0-1.1.9-2 2-2h2a2 2 0 010 4H4M5 9a2 2 0 002 2h1a2 2 0 000-4" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+        </button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="tb-btn" onclick="fmt('insertUnorderedList')" title="Bullet list">
+          <svg width="14" height="14" viewBox="0 0 14 14"><circle cx="2.5" cy="4" r="1.2" fill="currentColor"/><circle cx="2.5" cy="10" r="1.2" fill="currentColor"/><path d="M5.5 4h7M5.5 10h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+        <button class="tb-btn" onclick="fmt('insertOrderedList')" title="Numbered list">
+          <svg width="14" height="14" viewBox="0 0 14 14"><text x="0" y="6" font-size="6" fill="currentColor">1.</text><text x="0" y="12.5" font-size="6" fill="currentColor">2.</text><path d="M5.5 4h7M5.5 10h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Insert -->
+      <div class="toolbar-group">
+        <button class="tb-btn" onclick="insertTable()" title="Insert table">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 5h12M5 5v8" stroke="currentColor" stroke-width="1.3"/></svg>
+          Table
+        </button>
+        <label class="tb-btn" for="fileUpload" title="Attach image or file">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M1 9l3-3 2.5 2.5L10 5l3 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          Image
+        </label>
+        <input type="file" id="fileUpload" accept="image/*,.pdf,.doc,.docx">
+      </div>
+
+      <!-- Actions -->
+      <div class="toolbar-group">
+        <button class="tb-btn primary" onclick="manualSave()" title="Save (Ctrl+S)">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 11V4l3-3h5a1 1 0 011 1v9a1 1 0 01-1 1H3a1 1 0 01-1-1z" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 11V8h4v3M4.5 1v3h3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Save
+        </button>
+        <button class="tb-btn danger" onclick="deleteSheet()" title="Delete current sheet">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 3h9M5 3V2h3v1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><rect x="2.5" y="3.5" width="8" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 6v4M7.5 6v4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+          Delete
+        </button>
+      </div>
+
+    </div>
+
+    <div class="editor-scroll">
+      <div id="editor" contenteditable="true" spellcheck="true"></div>
+    </div>
+
+    <div class="status-bar">
+      <span id="wordCount">0 words · 0 chars</span>
+      <span id="saveStatus"></span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast notification -->
+<div id="toast"></div>
+
+<script src="/static/editor.js"></script>
+</body>
+</html>
