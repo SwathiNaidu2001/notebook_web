@@ -1184,3 +1184,36 @@ window.addEventListener("beforeunload", () => {
   saveEditorSilent()
   navigator.sendBeacon("/save", new Blob([JSON.stringify(sheets)], { type: "application/json" }))
 })
+
+function loadSheets() {
+  fetch("/load")
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) { newSheet(); return }
+      sheets = data
+      renderSheets()
+
+      // Restore last opened sheet
+      const lastId = localStorage.getItem("lastSheetId")
+      const found = lastId && sheets.find(s => s.id === lastId)
+      if (found) {
+        openSheet(found.id)
+      } else if (sheets.length > 0) {
+        openSheet(sheets[0].id)  // fallback to first sheet
+      }
+    })
+}
+
+function openSheet(id) {
+  if (current === id) return
+  saveEditorSilent()
+  current = id
+  localStorage.setItem("lastSheetId", id)  // ← add this line
+  const sheet = sheets.find(s => s.id === id)
+  editor.innerHTML = sheet ? (sheet.content || "") : ""
+  attachDeleteButtons()
+  enableAllTableDragDrop()
+  renderSheets()
+  updateWordCount()
+  editor.focus()
+}
