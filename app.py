@@ -6,8 +6,8 @@ import mimetypes
 
 app = Flask(__name__)
 
-# client = MongoClient("mongodb+srv://swathim:61GBHPDriOeLqhYL@cluster0.obtwbz8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-client = MongoClient("mongodb://localhost:27017/")
+client = MongoClient("mongodb+srv://swathim:61GBHPDriOeLqhYL@cluster0.obtwbz8.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+# client = MongoClient("mongodb://localhost:27017/")
 
 db = client["flask_auth_db"]
 
